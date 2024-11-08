@@ -21,9 +21,17 @@ const QRCodeScanner = () => {
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
+        const constraints = {
+          video: {
+            facingMode: "environment", // This requests the rear camera
+          },
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   video: true,
+        // });
         const videoElement = videoRef.current;
         if (videoElement && !videoElement.srcObject) {
           videoElement.srcObject = stream;
