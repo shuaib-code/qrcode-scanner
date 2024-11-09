@@ -23,7 +23,9 @@ const QRCodeScanner = () => {
       try {
         const constraints = {
           video: {
-            facingMode: "environment", // This requests the rear camera
+            facingMode: "environment",
+            width: { ideal: 1280 }, // Set ideal width (adjust based on device capabilities)
+            height: { ideal: 720 }, // Set ideal height
           },
         };
 
