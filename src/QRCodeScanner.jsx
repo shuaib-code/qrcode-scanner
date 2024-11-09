@@ -11,11 +11,11 @@ const QRCodeScanner = () => {
     const audioContext = new (window.AudioContext ||
       window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
-    oscillator.type = "square";
-    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(2000, audioContext.currentTime);
     oscillator.connect(audioContext.destination);
     oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.1);
+    oscillator.stop(audioContext.currentTime + 0.13);
   };
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const QRCodeScanner = () => {
         style={{ marginTop: "20px" }}
         className="flex justify-center items-center"
       >
-        <p>
+        <div>
           {isScanning ? (
             <div
               className="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-green-700 rounded-full"
@@ -173,7 +173,7 @@ const QRCodeScanner = () => {
               <span className="sr-only">Loading...</span>
             </div>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );
