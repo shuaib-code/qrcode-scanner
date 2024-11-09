@@ -37,7 +37,7 @@ const QRCodeScanner = () => {
           videoElement.srcObject = stream;
           videoElement.setAttribute("playsinline", true);
           videoElement.onloadedmetadata = () => {
-            scanQRCode();
+            setTimeout(scanQRCode, 500);
           };
         }
       } catch (err) {
@@ -72,7 +72,10 @@ const QRCodeScanner = () => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
+      preprocessImage(context, imageData)// preprocces image
+      const code = jsQR(imageData.data, canvas.width, canvas.height, {
+        inversionAttempts: "attemptBoth", // Adjust inversion if QR code is inverted
+      });
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -98,10 +101,19 @@ const QRCodeScanner = () => {
 
     requestAnimationFrame(scanQRCode);
   };
+  // Preprocess image for better QR detection
+  const preprocessImage = (context, imageData) => {
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3; // Grayscale
+      data[i] = data[i + 1] = data[i + 2] = avg;
+    }
+    context.putImageData(imageData, 0, 0);
+  };
 
   return (
     <div>
-      <div className=" border-2 rounded-md border-green-800">
+      <div className=" max-w-[410px] border-2 rounded-md border-green-800">
         <video
           className=" border-2 rounded-md"
           ref={videoRef}
@@ -140,11 +152,12 @@ const QRCodeScanner = () => {
           </div>
         </div>
       </div>
-      <ul className="flex flex-col">
+      <ul className="flex flex-col max-w-[500px]">
         {[...qrResults].map((result, index) => (
           <li
             key={index}
-            className="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium odd:bg-gray-100 bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg"
+            className="inline-flex overflow-hidden
+             items-center gap-x-2 py-3 px-4 text-sm font-medium odd:bg-gray-100 bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg"
             onClick={() => navigator.clipboard.writeText(result)}
           >
             {index + 1 + ". " + result}
